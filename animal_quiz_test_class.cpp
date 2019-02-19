@@ -39,21 +39,21 @@ static char * when_guess_is_correct_then_the_message_will_be_yeah() {
 }
 
 
-static char * test_add_element_to_list() {
-    Str_list* list; 
-    list = NULL;
-    add_element_to_list(&list,(char*)"hello");
-    mu_assert((char*)"asdf",strcmp((char*)"hello",list->element)==0);
-    add_element_to_list(&list,(char*)"hellohello");
-    mu_assert((char*)"asdfasfd",strcmp((char*)"hellohello",list->next->element)==0);
-    char* exphead = head_element_of_list(&list);
-    mu_assert((char*)"head",strcmp(exphead,(char*)"hello")==0);
+// static char * test_add_element_to_list() {
+//     Str_list* list; 
+//     list = NULL;
+//     add_element_to_list(&list,(char*)"hello");
+//     mu_assert((char*)"asdf",strcmp((char*)"hello",list->element)==0);
+//     add_element_to_list(&list,(char*)"hellohello");
+//     mu_assert((char*)"asdfasfd",strcmp((char*)"hellohello",list->next->element)==0);
+//     char* exphead = head_element_of_list(&list);
+//     mu_assert((char*)"head",strcmp(exphead,(char*)"hello")==0);
 
-    Str_list* tail = tail_of_list(list);
-    mu_assert((char*)"tail",strcmp(tail->element,(char*)"hellohello")==0);
+//     Str_list* tail = tail_of_list(list);
+//     mu_assert((char*)"tail",strcmp(tail->element,(char*)"hellohello")==0);
 
-    return 0;
-}
+//     return 0;
+// }
 
 
 static char * when_guess_is_not_correct_then_the_state_will_be_ask_what_animal_was() {
@@ -107,9 +107,9 @@ static char * after_asking_what_is_the_answer_to_the_discriinating_will_receive_
         model->message_from_engine_ref)==0));
     mu_assert((char*)"state should be GETTING_ANSWER_TO_DISCRIMINATING_QUESTION",model->state==GETTING_ANSWER_TO_DISCRIMINATING_QUESTION);
     update_model(model,(char*)"no");
-    mu_assert((char*)"new root",model->Knowledge_tree->leaf_or_not_leaf==IS_NON_LEAF);
-    mu_assert((char*)"new root2",(strcmp(model->Knowledge_tree->discriminating_question,(char*)"is it big?")==0));
-    mu_assert((char*)"new root3",(strcmp(model->Knowledge_tree->yes_branch->animal,(char*)"elephant")==0));
+    mu_assert((char*)"new root",model->knowledge_tree->leaf_or_not_leaf==IS_NON_LEAF);
+    mu_assert((char*)"new root2",(strcmp(model->knowledge_tree->discriminating_question,(char*)"is it big?")==0));
+    mu_assert((char*)"new root3",(strcmp(model->knowledge_tree->yes_branch->animal,(char*)"elephant")==0));
 
     return 0;
 }
@@ -130,7 +130,7 @@ static char * will_create_a_new_tree_structure_after_learning() {
         model->message_from_engine_ref)==0));
     mu_assert((char*)"state should be GETTING_ANSWER_TO_DISCRIMINATING_QUESTION",model->state==GETTING_ANSWER_TO_DISCRIMINATING_QUESTION);
     update_model(model,(char*)"no");
-    mu_assert((char*)"the new type of knowledge tree is non leaf",model->Knowledge_tree->leaf_or_not_leaf == IS_NON_LEAF);
+    mu_assert((char*)"the new type of knowledge tree is non leaf",model->knowledge_tree->leaf_or_not_leaf == IS_NON_LEAF);
     return 0;
 }
 
@@ -139,7 +139,7 @@ static char * will_navigate_the_non_leaf_tree_by_questions() {
     Knowledge_tree* yes_node= new Knowledge_tree((char*)"elephant");
     Knowledge_tree* no_node=new Knowledge_tree((char*)"cat");
     Knowledge_tree* composed_tree = new Knowledge_tree((char*)"is it big?",yes_node,no_node);
-    model->Knowledge_tree = composed_tree;
+    model->knowledge_tree = composed_tree;
     model->current_node = composed_tree;
     update_model(model,(char*)"");
     mu_assert((char*)"next state is not GUESSING",model->state == GUESSING_STATE);
@@ -157,7 +157,7 @@ static char * will_navigate_the_non_leaf_tree_by_questions_2() {
     Knowledge_tree* yes_node=new Knowledge_tree((char*)"elephant");
     Knowledge_tree* no_node=new Knowledge_tree((char*)"cat");
     Knowledge_tree* composed_tree = new Knowledge_tree((char*)"is it big?",yes_node,no_node);
-    model->Knowledge_tree = composed_tree;
+    model->knowledge_tree = composed_tree;
     model->current_node = composed_tree;
     update_model(model,(char*)"");
     mu_assert((char*)"next state is not GUESSING",model->state == GUESSING_STATE);
@@ -172,7 +172,7 @@ static char * will_navigate_the_non_leaf_tree_by_questions_2() {
 
 static char * leaning_on_a_non_leaf_tree() {
     Model* model = get_initial_model();
-    model->Knowledge_tree = new Knowledge_tree((char*)"is it big?",new Knowledge_tree((char*)"elephant"),new Knowledge_tree((char*)"cat"));
+    model->knowledge_tree = new Knowledge_tree((char*)"is it big?",new Knowledge_tree((char*)"elephant"),new Knowledge_tree((char*)"cat"));
     update_model(model,(char*)"");
 
 
@@ -197,14 +197,14 @@ static char * leaning_on_a_non_leaf_tree() {
     mu_assert((char*)"message",strncmp(model->message_from_engine_ref,(char*)"what is the answer to the question 'does it like cheese'",15)==0);
     update_model(model,(char*)"yes");
     mu_assert((char*)"think about an animal",model->state == GUESSING_STATE);
-    mu_assert((char*)"non leaf",model->Knowledge_tree->leaf_or_not_leaf==IS_NON_LEAF);
-    mu_assert((char*)"leaf",model->Knowledge_tree->yes_branch->leaf_or_not_leaf==IS_LEAF);
-    mu_assert((char*)"elephant",strcmp(model->Knowledge_tree->yes_branch->animal,(char*)"elephant")==0);
-    mu_assert((char*)"leaf",model->Knowledge_tree->no_branch->leaf_or_not_leaf==IS_NON_LEAF);
-    mu_assert((char*)"does it like cheese?",strcmp(model->Knowledge_tree->no_branch->discriminating_question,(char*)"does it like cheese?")==0);
-    mu_assert((char*)"leaf 2",model->Knowledge_tree->no_branch->yes_branch->leaf_or_not_leaf=IS_LEAF);
-    mu_assert((char*)"mouseX",strcmp(model->Knowledge_tree->no_branch->yes_branch->animal,(char*)"mouse")==0);
-    mu_assert((char*)"mouseX2",strcmp(model->Knowledge_tree->no_branch->no_branch->animal,(char*)"cat")==0);
+    mu_assert((char*)"non leaf",model->knowledge_tree->leaf_or_not_leaf==IS_NON_LEAF);
+    mu_assert((char*)"leaf",model->knowledge_tree->yes_branch->leaf_or_not_leaf==IS_LEAF);
+    mu_assert((char*)"elephant",strcmp(model->knowledge_tree->yes_branch->animal,(char*)"elephant")==0);
+    mu_assert((char*)"leaf",model->knowledge_tree->no_branch->leaf_or_not_leaf==IS_NON_LEAF);
+    mu_assert((char*)"does it like cheese?",strcmp(model->knowledge_tree->no_branch->discriminating_question,(char*)"does it like cheese?")==0);
+    mu_assert((char*)"leaf 2",model->knowledge_tree->no_branch->yes_branch->leaf_or_not_leaf=IS_LEAF);
+    mu_assert((char*)"mouseX",strcmp(model->knowledge_tree->no_branch->yes_branch->animal,(char*)"mouse")==0);
+    mu_assert((char*)"mouseX2",strcmp(model->knowledge_tree->no_branch->no_branch->animal,(char*)"cat")==0);
     mu_assert((char*)"guessing",model->state == GUESSING_STATE);
     update_model(model,(char*)"");
     mu_assert((char*)"asf",model->state == CHECKING_GUESS_IN_NON_LEAF_NODE_STATE);
@@ -230,10 +230,10 @@ static char *reproducing_bug() {
     update_model(model,(char*)"cat");
     update_model(model,(char*)"is it big?");
     update_model(model,(char*)"no"); 
-    mu_assert((char*)"should be non leaf",model->Knowledge_tree->leaf_or_not_leaf==IS_NON_LEAF);
-    mu_assert((char*)"root shuld be question is it big",(strcmp(model->Knowledge_tree->discriminating_question,(char*)"is it big?")==0));
-    mu_assert((char*)"yes branch should be elephant",strcmp(model->Knowledge_tree->yes_branch->animal,(char*)"elephant")==0);
-    mu_assert((char*)"no branch should be cat",strcmp(model->Knowledge_tree->no_branch->animal,(char*)"cat")==0);
+    mu_assert((char*)"should be non leaf",model->knowledge_tree->leaf_or_not_leaf==IS_NON_LEAF);
+    mu_assert((char*)"root shuld be question is it big",(strcmp(model->knowledge_tree->discriminating_question,(char*)"is it big?")==0));
+    mu_assert((char*)"yes branch should be elephant",strcmp(model->knowledge_tree->yes_branch->animal,(char*)"elephant")==0);
+    mu_assert((char*)"no branch should be cat",strcmp(model->knowledge_tree->no_branch->animal,(char*)"cat")==0);
 
     // starts again
     update_model(model,(char*)""); 
@@ -244,13 +244,13 @@ static char *reproducing_bug() {
     update_model(model,(char*)"cheese?"); 
     update_model(model,(char*)"yes");  
 
-    mu_assert((char*)"should be non leaf",model->Knowledge_tree->leaf_or_not_leaf==IS_NON_LEAF);
-    mu_assert((char*)"root shuld be question is it big",(strcmp(model->Knowledge_tree->discriminating_question,(char*)"is it big?")==0));
-    mu_assert((char*)"yes branch should be elephant",strcmp(model->Knowledge_tree->yes_branch->animal,(char*)"elephant")==0);
-    mu_assert((char*)"no branch should be non leaf",(model->Knowledge_tree->no_branch->leaf_or_not_leaf == IS_NON_LEAF));
-    mu_assert((char*)"no branch question should bshould be cheese",strcmp(model->Knowledge_tree->no_branch->discriminating_question,(char*)"cheese?")==0);
-    mu_assert((char*)"mouse check",strcmp(model->Knowledge_tree->no_branch->yes_branch->animal,(char*)"mouse")==0);
-    mu_assert((char*)"cat check",strcmp(model->Knowledge_tree->no_branch->no_branch->animal,(char*)"cat")==0);
+    mu_assert((char*)"should be non leaf",model->knowledge_tree->leaf_or_not_leaf==IS_NON_LEAF);
+    mu_assert((char*)"root shuld be question is it big",(strcmp(model->knowledge_tree->discriminating_question,(char*)"is it big?")==0));
+    mu_assert((char*)"yes branch should be elephant",strcmp(model->knowledge_tree->yes_branch->animal,(char*)"elephant")==0);
+    mu_assert((char*)"no branch should be non leaf",(model->knowledge_tree->no_branch->leaf_or_not_leaf == IS_NON_LEAF));
+    mu_assert((char*)"no branch question should bshould be cheese",strcmp(model->knowledge_tree->no_branch->discriminating_question,(char*)"cheese?")==0);
+    mu_assert((char*)"mouse check",strcmp(model->knowledge_tree->no_branch->yes_branch->animal,(char*)"mouse")==0);
+    mu_assert((char*)"cat check",strcmp(model->knowledge_tree->no_branch->no_branch->animal,(char*)"cat")==0);
 
     update_model(model,(char*)""); 
     
@@ -261,15 +261,15 @@ static char *reproducing_bug() {
     update_model(model,(char*)"estinct?");  
     update_model(model,(char*)"yes");  
 
-    mu_assert((char*)"should be non leaf",model->Knowledge_tree->leaf_or_not_leaf==IS_NON_LEAF); 
-    mu_assert((char*)"root shuld be question is it big",(strcmp(model->Knowledge_tree->discriminating_question,(char*)"is it big?")==0));
-    mu_assert((char*)"yes branch should be non leafXXXX",model->Knowledge_tree->yes_branch->leaf_or_not_leaf==IS_NON_LEAF);
-    mu_assert((char*)"question is estinct" ,strcmp(model->Knowledge_tree->yes_branch->discriminating_question,(char*)"estinct?")==0);
-    mu_assert((char*)"yes branch of yes branch should be leaf",model->Knowledge_tree->yes_branch->yes_branch->leaf_or_not_leaf == IS_LEAF);
-    mu_assert((char*)"no branch of yes branch should be leaf",model->Knowledge_tree->yes_branch->no_branch->leaf_or_not_leaf == IS_LEAF);
+    mu_assert((char*)"should be non leaf",model->knowledge_tree->leaf_or_not_leaf==IS_NON_LEAF); 
+    mu_assert((char*)"root shuld be question is it big",(strcmp(model->knowledge_tree->discriminating_question,(char*)"is it big?")==0));
+    mu_assert((char*)"yes branch should be non leafXXXX",model->knowledge_tree->yes_branch->leaf_or_not_leaf==IS_NON_LEAF);
+    mu_assert((char*)"question is estinct" ,strcmp(model->knowledge_tree->yes_branch->discriminating_question,(char*)"estinct?")==0);
+    mu_assert((char*)"yes branch of yes branch should be leaf",model->knowledge_tree->yes_branch->yes_branch->leaf_or_not_leaf == IS_LEAF);
+    mu_assert((char*)"no branch of yes branch should be leaf",model->knowledge_tree->yes_branch->no_branch->leaf_or_not_leaf == IS_LEAF);
 
-    mu_assert((char*)"pterodaptil",strcmp(model->Knowledge_tree->yes_branch->yes_branch->animal,(char*)"pterodaptil")==0);
-    mu_assert((char*)"elephant",strcmp(model->Knowledge_tree->yes_branch->no_branch->animal,(char*)"elephant")==0);
+    mu_assert((char*)"pterodaptil",strcmp(model->knowledge_tree->yes_branch->yes_branch->animal,(char*)"pterodaptil")==0);
+    mu_assert((char*)"elephant",strcmp(model->knowledge_tree->yes_branch->no_branch->animal,(char*)"elephant")==0);
 
     // starts again
     
@@ -284,18 +284,18 @@ static char *reproducing_bug() {
     char *outmessage = concatenate_strings(2,(char*)"initial state issue ",model->message_from_engine_ref);
     mu_assert(outmessage,strcmp(model->message_from_engine_ref,(char*)"is it big?")==0);
     
-    mu_assert((char*)"should be non leaf",model->Knowledge_tree->leaf_or_not_leaf==IS_NON_LEAF);
-    mu_assert((char*)"root shuld be question is it big",(strcmp(model->Knowledge_tree->discriminating_question,(char*)"is it big?")==0));
-    mu_assert((char*)"yes branch should be non leaf",model->Knowledge_tree->yes_branch->leaf_or_not_leaf==IS_NON_LEAF);
-    mu_assert((char*)"question is estinct" ,strcmp(model->Knowledge_tree->yes_branch->discriminating_question,(char*)"estinct?")==0);
-    mu_assert((char*)"yes branch of yes branch should be leaf",model->Knowledge_tree->yes_branch->yes_branch->leaf_or_not_leaf == IS_LEAF);
-    mu_assert((char*)"no branch of yes branch should be non leaf",model->Knowledge_tree->yes_branch->no_branch->leaf_or_not_leaf == IS_NON_LEAF);
-    mu_assert((char*)"deliver milk question",strcmp(model->Knowledge_tree->yes_branch->no_branch->discriminating_question,(char*)"deliver milk?")==0);
-    mu_assert((char*)"yes branch of no branch of yes branch should be leaf",model->Knowledge_tree->yes_branch->no_branch->yes_branch->leaf_or_not_leaf == IS_LEAF);
-    mu_assert((char*)"no branch of no branch of yes branch should be leaf",model->Knowledge_tree->yes_branch->no_branch->no_branch->leaf_or_not_leaf == IS_LEAF);
+    mu_assert((char*)"should be non leaf",model->knowledge_tree->leaf_or_not_leaf==IS_NON_LEAF);
+    mu_assert((char*)"root shuld be question is it big",(strcmp(model->knowledge_tree->discriminating_question,(char*)"is it big?")==0));
+    mu_assert((char*)"yes branch should be non leaf",model->knowledge_tree->yes_branch->leaf_or_not_leaf==IS_NON_LEAF);
+    mu_assert((char*)"question is estinct" ,strcmp(model->knowledge_tree->yes_branch->discriminating_question,(char*)"estinct?")==0);
+    mu_assert((char*)"yes branch of yes branch should be leaf",model->knowledge_tree->yes_branch->yes_branch->leaf_or_not_leaf == IS_LEAF);
+    mu_assert((char*)"no branch of yes branch should be non leaf",model->knowledge_tree->yes_branch->no_branch->leaf_or_not_leaf == IS_NON_LEAF);
+    mu_assert((char*)"deliver milk question",strcmp(model->knowledge_tree->yes_branch->no_branch->discriminating_question,(char*)"deliver milk?")==0);
+    mu_assert((char*)"yes branch of no branch of yes branch should be leaf",model->knowledge_tree->yes_branch->no_branch->yes_branch->leaf_or_not_leaf == IS_LEAF);
+    mu_assert((char*)"no branch of no branch of yes branch should be leaf",model->knowledge_tree->yes_branch->no_branch->no_branch->leaf_or_not_leaf == IS_LEAF);
 
-    mu_assert((char*)"yes branch of no branch of yes branch should be cow",strcmp(model->Knowledge_tree->yes_branch->no_branch->yes_branch->animal,(char*)"cow") == 0);
-    mu_assert((char*)"no branch of no branch of yes branch should be elephant",strcmp(model->Knowledge_tree->yes_branch->no_branch->no_branch->animal,(char*)"elephant") == 0);
+    mu_assert((char*)"yes branch of no branch of yes branch should be cow",strcmp(model->knowledge_tree->yes_branch->no_branch->yes_branch->animal,(char*)"cow") == 0);
+    mu_assert((char*)"no branch of no branch of yes branch should be elephant",strcmp(model->knowledge_tree->yes_branch->no_branch->no_branch->animal,(char*)"elephant") == 0);
 
     update_model(model,(char*)"");  
     mu_assert((char*)"ask if it is big",strcmp(model->message_from_engine_ref,(char*)"is it big?")==0);
@@ -318,7 +318,7 @@ static char *reproducing_bug() {
 static char * all_tests() {
     mu_run_test(test_foo);
     mu_run_test(test_knowledge_tree_class);
-    mu_run_test(test_add_element_to_list);
+    // mu_run_test(test_add_element_to_list);
     mu_run_test(when_guess_is_correct_then_the_message_will_be_yeah);
     mu_run_test(when_guess_is_not_correct_then_the_state_will_be_ask_what_animal_was);
     mu_run_test(after_asking_what_animal_was_will_get_ask_the_question_to_distinguish);

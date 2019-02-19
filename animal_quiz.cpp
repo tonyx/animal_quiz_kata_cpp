@@ -90,8 +90,8 @@ typedef struct Model {
     State state;
     Str_list* yes_no_list;
     char* message_from_engine_ref;
-    Knowledge_tree* Knowledge_tree;
-    class Knowledge_tree* current_node;
+    Knowledge_tree* knowledge_tree;
+    Knowledge_tree* current_node;
 
 } Model;
 
@@ -124,7 +124,7 @@ void update_model(Model* model,char *user_input) {
         case THINK_ABOUT_AN_ANIMAL_STATE:
             free(model->message_from_engine_ref);
             model->message_from_engine_ref = concatenate_strings(1,THINK_ABOUT_AN_ANIMAL_MESSAGE);
-            model->current_node = model->Knowledge_tree;
+            model->current_node = model->knowledge_tree;
             model->state=GUESSING_STATE;
             break;
         case GUESSING_STATE:
@@ -190,8 +190,8 @@ void update_model(Model* model,char *user_input) {
             if ((strcmp("no",user_input)!=0)&&(strcmp("yes",user_input)!=0)) {
                 break;
             }
-            model->Knowledge_tree->rearrange_knowledge_tree (model->yes_no_list,model->discriminating_question_for_learning,user_input,model->animal_to_be_learned);
-            model->current_node = model->Knowledge_tree;
+            model->knowledge_tree->rearrange_knowledge_tree (model->yes_no_list,model->discriminating_question_for_learning,user_input,model->animal_to_be_learned);
+            model->current_node = model->knowledge_tree;
             free(model->message_from_engine_ref);
             model->message_from_engine_ref=concatenate_strings(1,"let's start again. Think about an animal");
             free_str_list(&model->yes_no_list);
@@ -227,8 +227,8 @@ Model* get_initial_model() {
     to_return->state=THINK_ABOUT_AN_ANIMAL_STATE;
     to_return->animal_to_be_learned=concatenate_strings(1,"");
     to_return->message_from_engine_ref=concatenate_strings(1,WELCOME_MESSAGE);
-    to_return->Knowledge_tree = new Knowledge_tree((char*)"elephant");
-    to_return->current_node = to_return->Knowledge_tree;
+    to_return->knowledge_tree = new Knowledge_tree((char*)"elephant");
+    to_return->current_node = to_return->knowledge_tree;
     to_return->yes_no_list=NULL;
     return to_return;
 }
