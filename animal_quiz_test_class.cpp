@@ -1,14 +1,17 @@
 #define UNIT_TESTING
 
-#include "minunit.h"
-#include "animal_quiz.cpp"
 
 #ifndef STDIO_INCLUDED 
+
+#include "minunit.h"
+#include "animal_quiz.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-#include "myutils.cpp"
+#include <iostream>
+#include <stdexcept>
+using namespace std;
 #endif 
 #define STDIO_INCLUDED
 

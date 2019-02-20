@@ -4,6 +4,9 @@
 #include <string.h>
 #include <stdarg.h>
 #include "myutils.h"
+#include <iostream>
+#include <stdexcept>
+using namespace std;
 #endif 
 #define STDIO_INCLUDED
 
@@ -68,13 +71,13 @@ char * concatenate_strings(int num, ...) {
 }
 
 void get_user_input(char* user_input) {
-        fgets(user_input,97,stdin);
-        if (user_input==NULL||strlen(user_input)==0) {
-            user_input=concatenate_strings(1,"");
-        } else {
-            char * eof = strchr(user_input,'\n');
-            if (eof!=0) {
-                *eof = '\0'; 
-            }
+    fgets(user_input,97,stdin);
+    if (user_input==NULL||strlen(user_input)==0) {
+        user_input=concatenate_strings(1,"");
+    } else {
+        char * eof = strchr(user_input,'\n');
+        if (eof!=0) {
+            *eof = '\0'; 
         }
+    }
 }

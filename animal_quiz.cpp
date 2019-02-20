@@ -2,38 +2,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-#include "myutils.cpp"
+#include "animal_quiz.h"
+#include <iostream>
+#include <stdexcept>
+using namespace std;
 #define STDIO_INCLUDED
+#define NO_MAIN
 
 const char* THINK_ABOUT_AN_ANIMAL_MESSAGE = "think about an animal";
 const char* WELCOME_MESSAGE = "welcome";
-
-#define IS_LEAF 1
-#define IS_NON_LEAF 0
-
-typedef enum {THINK_ABOUT_AN_ANIMAL_STATE,
-    GUESSING_STATE,
-    CHECKING_GUESS_IN_LEAF_NODE_STATE,
-    CHECKING_GUESS_IN_NON_LEAF_NODE_STATE,
-    GETTING_ANIMAL_NAME_STATE,
-    GETTING_DISCRIMINATING_QUESTION,
-    GETTING_ANSWER_TO_DISCRIMINATING_QUESTION,
-    } State;
-
-
-class Knowledge_tree {
-    public:
-    int leaf_or_not_leaf;
-    char * animal;
-    char * discriminating_question;
-    Knowledge_tree * yes_branch;
-    Knowledge_tree * no_branch;
-    Knowledge_tree(char* animal);
-    Knowledge_tree(char* discriminating_question,Knowledge_tree* yes_branch, Knowledge_tree* no_branch);
-    void rearrange_knowledge_tree(Str_list* yes_no_list,char* new_discriminating_question,char* answer_to_new_discriminating_question, char* new_animal_name);
-
-    ~Knowledge_tree();
-};
 
 Knowledge_tree::Knowledge_tree(char* animal) {
     this->leaf_or_not_leaf=IS_LEAF;
@@ -49,6 +26,12 @@ Knowledge_tree::Knowledge_tree(char* discriminating_question,Knowledge_tree* yes
 
 void Knowledge_tree::rearrange_knowledge_tree(Str_list* yes_no_list,char* new_discriminating_question,char* answer_to_new_discriminating_question, char* new_animal_name) 
 {
+    if (!(strcmp(answer_to_new_discriminating_question,"no")==0)&&!(strcmp(answer_to_new_discriminating_question,"yes")==0))
+    {
+        std::cerr << concatenate_strings(2,"the string passed must be 'yes' or 'no' while it's value is ",answer_to_new_discriminating_question) << endl;
+        throw std::runtime_error("parmeter error");
+    }
+
     if (!has_elements(&yes_no_list)) {
         this->leaf_or_not_leaf=IS_NON_LEAF;
         this->discriminating_question = concatenate_strings(1,new_discriminating_question);
@@ -83,32 +66,18 @@ Knowledge_tree::~Knowledge_tree() {
 }
 
 
-typedef struct Model {
-    char* animal_to_be_learned;
-    char* answer_to_discrimated_question;
-    char* discriminating_question_for_learning;
-    State state;
-    Str_list* yes_no_list;
-    char* message_from_engine_ref;
-    Knowledge_tree* knowledge_tree;
-    Knowledge_tree* current_node;
-
-} Model;
-
-Model* get_initial_model();
 void update_model(Model* model,char * user_input);
 
 
 // spike;
 void huge_set_model(Model* model); 
 
-#ifndef UNIT_TESTING
+#ifndef NO_MAIN
 int main(int argc, char **argv) {
     char user_input[97];
     Model * model = get_initial_model();
     while(1) {
-        // printf("%s\n",model->message_from_engine);
-        printf("%s\n",model->message_from_engine_ref);
+        std::cout << model->message_from_engine_ref << endl;
         get_user_input(user_input);
 
         update_model(model,user_input);
