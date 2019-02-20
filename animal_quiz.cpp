@@ -42,6 +42,8 @@ void Knowledge_tree::rearrange_knowledge_tree(Str_list* yes_no_list,char* new_di
             this->yes_branch = new Knowledge_tree(new_animal_name);
             this->no_branch = new Knowledge_tree(animal);
         }
+        free(this->animal);
+
     } else {
         if (strcmp(yes_no_list->element,"no")==0) {
             this->no_branch->rearrange_knowledge_tree(yes_no_list->next,new_discriminating_question,

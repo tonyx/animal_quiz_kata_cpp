@@ -100,7 +100,7 @@ static char * after_asking_what_is_the_answer_to_the_discriinating_will_receive_
     model->state = GETTING_ANIMAL_NAME_STATE; 
     update_model(model,(char*)"cat");
 
-    model->animal_to_be_learned = concatenate_strings(1,(char*)"cat");
+    // model->animal_to_be_learned = concatenate_strings(1,(char*)"cat");
 
     mu_assert((char*)"the animal to be learned should be a cat",strcmp((char*)"cat",model->animal_to_be_learned)==0);
     mu_assert((char*)"the question is not as expected",
