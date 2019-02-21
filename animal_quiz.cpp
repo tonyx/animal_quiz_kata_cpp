@@ -34,10 +34,13 @@ Knowledge_tree_ref* Knowledge_tree_ref_leaf::rearrange_knowledge_tree(Str_list* 
         throw std::runtime_error("parmeter error");
     }
 
+    char* old_animal = concatenate_strings(1,animal);
     if (strcmp("no",answer_to_new_discriminating_question)==0) {
-        return new Knowledge_tree_ref_non_leaf(new_discriminating_question,new Knowledge_tree_ref_leaf(animal),new Knowledge_tree_ref_leaf(new_animal_name));
+        delete(this);
+        return new Knowledge_tree_ref_non_leaf(new_discriminating_question,new Knowledge_tree_ref_leaf(old_animal),new Knowledge_tree_ref_leaf(new_animal_name));
     } else {
-        return new Knowledge_tree_ref_non_leaf(new_discriminating_question,new Knowledge_tree_ref_leaf(new_animal_name),new Knowledge_tree_ref_leaf(animal));
+        delete(this);
+        return new Knowledge_tree_ref_non_leaf(new_discriminating_question,new Knowledge_tree_ref_leaf(new_animal_name),new Knowledge_tree_ref_leaf(old_animal));
     }
 }
 
