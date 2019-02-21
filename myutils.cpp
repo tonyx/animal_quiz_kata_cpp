@@ -42,12 +42,9 @@ void free_str_list(Str_list** list) {
     }
 }
 
-
 struct str_list* tail_of_list(struct str_list* list) {
     return list->next;
 }
-
-
 
 char * concatenate_strings(int num, ...) {
     char* to_return;
