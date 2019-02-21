@@ -6,11 +6,12 @@
 
 class Knowledge_tree_ref {
     public:
+    int leaf_or_not_leaf;
     char * animal;
     char * discriminating_question;
     Knowledge_tree_ref* yes_branch;
     Knowledge_tree_ref* no_branch;
-    virtual ~Knowledge_tree_ref() = 0;
+    // virtual ~Knowledge_tree_ref() = 0;
     virtual Knowledge_tree_ref* rearrange_knowledge_tree(Str_list* yes_no_list,char* new_discriminating_question,char* answer_to_new_discriminating_question, char* new_animal_name) =0;
 };
 
@@ -19,7 +20,6 @@ class Knowledge_tree_ref_non_leaf: public Knowledge_tree_ref {
     public:
     Knowledge_tree_ref* rearrange_knowledge_tree(Str_list* yes_no_list,char* new_discriminating_question,char* answer_to_new_discriminating_question, char* new_animal_name);
     Knowledge_tree_ref_non_leaf(char* discriminating_question,Knowledge_tree_ref* yes_branch, Knowledge_tree_ref* no_branch);
-    ~Knowledge_tree_ref_non_leaf();
 };
 
 
@@ -27,7 +27,7 @@ class Knowledge_tree_ref_leaf: public Knowledge_tree_ref {
     public:
     Knowledge_tree_ref* rearrange_knowledge_tree(Str_list* yes_no_list,char* new_discriminating_question,char* answer_to_new_discriminating_question, char* new_animal_name);
     Knowledge_tree_ref_leaf(char* animal);
-    ~Knowledge_tree_ref_leaf();
+    // ~Knowledge_tree_ref_leaf();
 };
 
 
