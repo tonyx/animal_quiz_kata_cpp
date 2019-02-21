@@ -124,7 +124,7 @@ static char * will_navigate_the_non_leaf_tree_by_questions() {
     Knowledge_tree_ref* no_node=new Knowledge_tree_ref_leaf((char*)"cat");
     Knowledge_tree_ref* composed_tree = new Knowledge_tree_ref_non_leaf((char*)"is it big?",yes_node,no_node);
     model->knowledge_tree_ref = composed_tree;
-    model->current_node_ref = composed_tree;
+    model->current_node_ref = model->knowledge_tree_ref;
     update_model(model,(char*)"");
     mu_assert((char*)"next state is not GUESSING",model->state == GUESSING_STATE);
     update_model(model,(char*)"");
@@ -136,6 +136,15 @@ static char * will_navigate_the_non_leaf_tree_by_questions() {
     return 0;
 }
 
+static char * test_list() {
+    Str_list* str_list = NULL;
+    int size_calc = 0;
+    mu_assert((char*)"test size 0",list_size(&str_list,&size_calc)==0);
+    add_element_to_list(&str_list,"ciao");
+    mu_assert((char*)"test size 0",list_size(&str_list,&size_calc)==1);
+    mu_assert((char*)"intege should be 1",size_calc==1);
+    return 0;
+}
 
 
 static char *reproducing_bug() {
@@ -228,6 +237,7 @@ static char *reproducing_bug() {
 }
 
 
+
 static char * all_tests() {
     mu_run_test(test_foo);
     mu_run_test(test_knowledge_tree_class);
@@ -238,6 +248,7 @@ static char * all_tests() {
     mu_run_test(after_asking_what_is_the_answer_to_the_discriinating_will_receive_the_answer);
     mu_run_test(will_create_a_new_tree_structure_after_learning);
     mu_run_test(will_navigate_the_non_leaf_tree_by_questions);
+    // mu_run_test(test_list);
     return 0;
 }
 
