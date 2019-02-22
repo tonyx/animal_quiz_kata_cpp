@@ -1,9 +1,9 @@
 typedef struct str_list {
-    char *element;
+    const char *element;
     struct str_list* next;
 } Str_list;
 
-void add_element_to_list(Str_list** list,  char* element);
+void add_element_to_list(Str_list** list, const char* element);
 char* head_element_of_list(Str_list** list); 
 int has_elements(Str_list** list);
 void free_str_list(Str_list** list);  
