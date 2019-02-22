@@ -10,11 +10,10 @@ using namespace std;
 #endif 
 #define STDIO_INCLUDED
 
-void add_element_to_list(Str_list** list,  char* element) {
+void add_element_to_list(Str_list** list, const  char* element) {
     if (*list==NULL) {
         *list = (Str_list*) malloc(sizeof(Str_list));
-        // (*list)->element = concatenate_strings(1,(char*)element);
-        (*list)->element = element; // concatenate_strings(1,(char*)element);
+        (*list)->element = element; 
         (*list)->next = NULL;
     } 
     else {
@@ -39,7 +38,6 @@ void free_str_list(Str_list** list) {
         return;
     } else {
         free_str_list(&(*list)->next);
-        // free(&(*list)->element);
         free(*list);
     }
 }
@@ -90,3 +88,4 @@ void get_user_input(char* user_input) {
         }
     }
 }
+

@@ -7,21 +7,18 @@
 #include <stdexcept>
 using namespace std;
 #define STDIO_INCLUDED
-// #define NO_MAIN
+#define NO_MAIN
 
 const char* THINK_ABOUT_AN_ANIMAL_MESSAGE = "think about an animal";
 const char* WELCOME_MESSAGE = "welcome";
 
 
 Knowledge_tree_ref_leaf::Knowledge_tree_ref_leaf(char* animal_in) {
-    this->leaf_or_not_leaf = IS_LEAF;
     this->animal = concatenate_strings(1,animal_in);
-    // this->animal=animal_in;
 }
 
 Knowledge_tree_ref_non_leaf::Knowledge_tree_ref_non_leaf(char* discriminating_question,Knowledge_tree_ref* yes_branch, Knowledge_tree_ref* no_branch) 
 {
-    this->leaf_or_not_leaf = IS_NON_LEAF;
     this->discriminating_question = concatenate_strings(1,discriminating_question);
     this->yes_branch=yes_branch;
     this->no_branch=no_branch;
@@ -35,13 +32,13 @@ Knowledge_tree_ref* Knowledge_tree_ref_leaf::rearrange_knowledge_tree(Str_list* 
         throw std::runtime_error("parmeter error");
     }
 
-    // char* old_animal = concatenate_strings(1,this->animal);
+    char* old_animal = concatenate_strings(1,this->animal);
     if (strcmp("no",answer_to_new_discriminating_question)==0) {
-        // delete(this);
-        return new Knowledge_tree_ref_non_leaf(new_discriminating_question,new Knowledge_tree_ref_leaf(animal),new Knowledge_tree_ref_leaf(new_animal_name));
+        delete(this);
+        return new Knowledge_tree_ref_non_leaf(new_discriminating_question,new Knowledge_tree_ref_leaf(old_animal),new Knowledge_tree_ref_leaf(new_animal_name));
     } else {
-        // delete(this);
-        return new Knowledge_tree_ref_non_leaf(new_discriminating_question,new Knowledge_tree_ref_leaf(new_animal_name),new Knowledge_tree_ref_leaf(animal));
+        delete(this);
+        return new Knowledge_tree_ref_non_leaf(new_discriminating_question,new Knowledge_tree_ref_leaf(new_animal_name),new Knowledge_tree_ref_leaf(old_animal));
     }
 }
 
@@ -54,31 +51,35 @@ Knowledge_tree_ref* Knowledge_tree_ref_non_leaf::rearrange_knowledge_tree(Str_li
     }
 
     if (strcmp(yes_no_list->element,"no")==0) {
-        // return this->no_branch->rearrange_knowledge_tree(yes_no_list->next,new_discriminating_question,
-        //     answer_to_new_discriminating_question,new_animal_name);
-
         return new Knowledge_tree_ref_non_leaf(this->discriminating_question,this->yes_branch,this->no_branch->rearrange_knowledge_tree(yes_no_list->next,new_discriminating_question,answer_to_new_discriminating_question,new_animal_name));
 
     } else {
-        // return this->yes_branch->rearrange_knowledge_tree(yes_no_list->next,new_discriminating_question,
-        //     answer_to_new_discriminating_question,new_animal_name);
-
         return new Knowledge_tree_ref_non_leaf(this->discriminating_question,this->yes_branch->rearrange_knowledge_tree(yes_no_list->next,new_discriminating_question,answer_to_new_discriminating_question,new_animal_name),this->no_branch);
     }
 }
 
-// Knowledge_tree_ref::~Knowledge_tree_ref() {
-// }
 
-// Knowledge_tree_ref_leaf::~Knowledge_tree_ref_leaf() {
-//     // free(animal);
-// }
+Knowledge_tree_ref::~Knowledge_tree_ref() {
+}
 
-// Knowledge_tree_ref_non_leaf::~Knowledge_tree_ref_non_leaf() {
-//     // free(discriminating_question);
-//     // delete(yes_branch);
-//     // delete(no_branch);
-// }
+Knowledge_tree_ref_leaf::~Knowledge_tree_ref_leaf() {
+    free(animal);
+}
+
+Knowledge_tree_ref_non_leaf::~Knowledge_tree_ref_non_leaf() {
+    free(discriminating_question);
+    delete(yes_branch);
+    delete(no_branch);
+}
+
+Model_ref::Model_ref() {
+
+}
+
+void Model_ref::update(char* user_input) {
+// write code here
+}
+
 
 void update_model(Model* model,char * user_input);
 
@@ -100,10 +101,10 @@ int main(int argc, char **argv) {
 
 
 void update_model(Model* model,char *user_input) {
-    add_element_to_list(&model->messages_list,user_input);
+    // (&model->messages_list,user_input);
     switch (model->state) {
         case THINK_ABOUT_AN_ANIMAL_STATE:
-            // free(model->message_from_engine_ref);
+            free(model->message_from_engine_ref);
             model->message_from_engine_ref = concatenate_strings(1,THINK_ABOUT_AN_ANIMAL_MESSAGE);
             model->current_node_ref = model->knowledge_tree_ref;
             model->state=GUESSING_STATE;
@@ -111,14 +112,13 @@ void update_model(Model* model,char *user_input) {
 
         case GUESSING_STATE:
 
-            // if (dynamic_cast<Knowledge_tree_ref_leaf*>(model->current_node_ref)!=NULL) 
-            if (model->current_node_ref->leaf_or_not_leaf == IS_LEAF) {
-
-                // free(model->message_from_engine_ref);
+            if (dynamic_cast<Knowledge_tree_ref_leaf*>(model->current_node_ref)!=NULL) 
+            {
+                free(model->message_from_engine_ref);
                 model->message_from_engine_ref = concatenate_strings(3,"is it a ",(model->current_node_ref)->animal,"?");
                 model->state = CHECKING_GUESS_IN_LEAF_NODE_STATE;
             } else {
-                // free(model->message_from_engine_ref);
+                free(model->message_from_engine_ref);
                 model->message_from_engine_ref = concatenate_strings(1,model->current_node_ref->discriminating_question);
                 model->state = CHECKING_GUESS_IN_NON_LEAF_NODE_STATE;
             }
@@ -126,11 +126,11 @@ void update_model(Model* model,char *user_input) {
 
         case CHECKING_GUESS_IN_LEAF_NODE_STATE:
             if (strcmp("yes",user_input)==0) {
-                // free(model->message_from_engine_ref);
+                free(model->message_from_engine_ref);
                 model->message_from_engine_ref = concatenate_strings(1,"yeah");
-               model->state=THINK_ABOUT_AN_ANIMAL_STATE;
+                model->state=THINK_ABOUT_AN_ANIMAL_STATE;
             } else if (strcmp("no",user_input)==0) {
-                // free(model->message_from_engine_ref);
+                free(model->message_from_engine_ref);
                 model->message_from_engine_ref = concatenate_strings(1,"what animal was?");
                 model->state = GETTING_ANIMAL_NAME_STATE;
             }
@@ -146,13 +146,12 @@ void update_model(Model* model,char *user_input) {
             } else 
                 break;
 
-        //    if (dynamic_cast<Knowledge_tree_ref_leaf*>(model->current_node_ref)!=NULL) 
-           if (model->current_node_ref->leaf_or_not_leaf == IS_LEAF)  {
-                // free(model->message_from_engine_ref);
+           if (dynamic_cast<Knowledge_tree_ref_leaf*>(model->current_node_ref)!=NULL) {
+                free(model->message_from_engine_ref);
                 model->message_from_engine_ref = concatenate_strings(3,"is it a ",(model->current_node_ref)->animal,"?");
                 model->state = CHECKING_GUESS_IN_LEAF_NODE_STATE;
             } else {
-                // free(model->message_from_engine_ref);
+                free(model->message_from_engine_ref);
                 model->message_from_engine_ref = concatenate_strings(1,model->current_node_ref->discriminating_question);
                 model->state = CHECKING_GUESS_IN_NON_LEAF_NODE_STATE;
             } 
@@ -164,7 +163,7 @@ void update_model(Model* model,char *user_input) {
             }
             free(model->animal_to_be_learned);
             model->animal_to_be_learned = concatenate_strings(1,user_input);
-            // free(model->message_from_engine_ref);
+            free(model->message_from_engine_ref);
             model->message_from_engine_ref= concatenate_strings(5,"what is the question to distinguish a ",
                    model->animal_to_be_learned," from a ",
                    (model->current_node_ref)->animal,"?");
@@ -179,7 +178,7 @@ void update_model(Model* model,char *user_input) {
             model->knowledge_tree_ref = model->knowledge_tree_ref->rearrange_knowledge_tree (model->yes_no_list,model->discriminating_question_for_learning,user_input,model->animal_to_be_learned);
             model->current_node_ref = model->knowledge_tree_ref;
 
-            // free(model->message_from_engine_ref);
+            free(model->message_from_engine_ref);
             model->message_from_engine_ref=concatenate_strings(1,"let's start again. Think about an animal");
             free_str_list(&model->yes_no_list);
             model->yes_no_list=NULL;
@@ -193,7 +192,7 @@ void update_model(Model* model,char *user_input) {
             char* discriminating_question_for_learning = concatenate_strings(1,user_input);
             free(model->discriminating_question_for_learning);
             model->discriminating_question_for_learning = discriminating_question_for_learning;
-            // free(model->message_from_engine_ref);
+            free(model->message_from_engine_ref);
             model->message_from_engine_ref=concatenate_strings(7,"what is the answer to the question '",
                 discriminating_question_for_learning,
                 "' to distinguish a ",
@@ -205,6 +204,8 @@ void update_model(Model* model,char *user_input) {
             break;
     }
 }
+
+
 
 Model* get_initial_model() {
     Model* to_return = (Model*)malloc(sizeof(Model));
@@ -219,7 +220,8 @@ Model* get_initial_model() {
     to_return->knowledge_tree_ref = new Knowledge_tree_ref_leaf(initial_animal);
 
     to_return->current_node_ref = to_return->knowledge_tree_ref;
-    to_return->messages_list=NULL;
+
+
     return to_return;
 }
 

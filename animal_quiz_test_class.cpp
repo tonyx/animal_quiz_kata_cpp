@@ -237,6 +237,31 @@ static char *reproducing_bug() {
 }
 
 
+static char * stdLibListTest() {
+    std::list<char*> myList;
+    
+    myList.clear();
+    myList.push_back((char*)"pipo");
+    mu_assert((char*)"list size",myList.size()==1);
+    myList.push_back((char*)"pipoX");
+    mu_assert((char*)"list size",myList.size()==2);
+    myList.clear();
+    mu_assert((char*)"list size",myList.size()==0);
+
+    std::string myString = std::string("ciao");
+    std::string secondString = std::string("ciao");
+    mu_assert((char*)"strings",myString==secondString);
+
+    Model_ref* model_ref = new Model_ref();
+    model_ref->yes_no_list.push_back("hello");
+
+    mu_assert((char*)"due",model_ref->yes_no_list.size()==1);
+
+    return 0;
+}
+
+
+
 
 static char * all_tests() {
     mu_run_test(test_foo);
@@ -248,11 +273,13 @@ static char * all_tests() {
     mu_run_test(after_asking_what_is_the_answer_to_the_discriinating_will_receive_the_answer);
     mu_run_test(will_create_a_new_tree_structure_after_learning);
     mu_run_test(will_navigate_the_non_leaf_tree_by_questions);
+    mu_run_test(reproducing_bug);
+    mu_run_test(stdLibListTest);
     // mu_run_test(test_list);
     return 0;
 }
 
-int main(int argc, char **argv) {
+int main() {
      char *result = all_tests();
      if (result != 0) {
          printf((char*)"%s\n", result);
