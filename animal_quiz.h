@@ -4,7 +4,6 @@
 #define IS_LEAF 1
 #define IS_NON_LEAF 0
 
-
 class Knowledge_tree_ref {
     public:
     char * animal;
@@ -42,17 +41,6 @@ typedef enum {THINK_ABOUT_AN_ANIMAL_STATE,
     } State;
 
 
-typedef struct Model {
-    char* animal_to_be_learned;
-    char* answer_to_discrimated_question;
-    char* discriminating_question_for_learning;
-    State state;
-    Str_list* yes_no_list;
-    char* message_from_engine_ref;
-    Knowledge_tree_ref* knowledge_tree_ref;
-    Knowledge_tree_ref* current_node_ref;
-
-} Model;
 
 class Model_ref {
     public:
@@ -61,7 +49,8 @@ class Model_ref {
     char* animal_to_be_learned;
     char* answer_to_discrimated_question;
     char* discriminating_question_for_learning;
-    std::list<std::string> yes_no_list;
+    Str_list* yes_no_list;
+    std::list<std::string> yes_no_list_ref;
     Knowledge_tree_ref* knowledge_tree_ref;
     Knowledge_tree_ref* current_node_ref;
 
@@ -69,6 +58,3 @@ class Model_ref {
     Model_ref();
 };
 
-
-Model* get_initial_model();
-void update_model(Model* model,char * user_input);
