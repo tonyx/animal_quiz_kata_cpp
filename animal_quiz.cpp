@@ -5,9 +5,12 @@
 #include "animal_quiz.h"
 #include <iostream>
 #include <stdexcept>
+#include <algorithm>
+#include <iostream>
+#include <list>
 using namespace std;
 #define STDIO_INCLUDED
-// #define NO_MAIN
+#define NO_MAIN
 
 const char* THINK_ABOUT_AN_ANIMAL_MESSAGE = "think about an animal";
 const char* WELCOME_MESSAGE = "welcome";
@@ -79,12 +82,41 @@ Model_ref::Model_ref() {
     state = THINK_ABOUT_AN_ANIMAL_STATE; 
     message_from_engine_ref = concatenate_strings(1,WELCOME_MESSAGE);
     yes_no_list=NULL;
+    messages = std::list<string>();
     knowledge_tree_ref = new Knowledge_tree_ref_leaf((char*)"elephant");
     current_node_ref = knowledge_tree_ref;
 }
 
+void Model_ref::rewind_n_times(int n) {
+    // reinit
+    delete(this->knowledge_tree_ref);
+    this->knowledge_tree_ref = new Knowledge_tree_ref_leaf((char*)"elephant");
+    this->current_node_ref = this->knowledge_tree_ref;
+    state = THINK_ABOUT_AN_ANIMAL_STATE; 
+
+    std:list<string> previous_messages; 
+    previous_messages = this->messages;
+    free_str_list(&yes_no_list);
+    this->yes_no_list=NULL;
+    int i=0;
+    for (auto it = previous_messages.begin();i<n;it++,i++) {
+        update((char*)(*it).c_str());
+    }
+    previous_messages.clear();
+}
+
+
 void Model_ref::update(char* user_input) {
-      switch (state) {
+    if (strcmp(user_input,"*")==0) {
+        int size = this->messages.size()-1;
+        if (size>2) {
+            this->rewind_n_times(size);
+        }
+        return;
+    } 
+
+    messages.push_back(user_input);
+    switch (state) {
         case THINK_ABOUT_AN_ANIMAL_STATE:
             free(message_from_engine_ref);
             message_from_engine_ref = concatenate_strings(1,THINK_ABOUT_AN_ANIMAL_MESSAGE);
