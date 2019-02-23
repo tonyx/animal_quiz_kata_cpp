@@ -41,7 +41,6 @@ typedef enum {THINK_ABOUT_AN_ANIMAL_STATE,
     } State;
 
 
-
 class Model_ref {
     public:
     char* message_from_engine_ref;
@@ -51,10 +50,11 @@ class Model_ref {
     char* discriminating_question_for_learning;
     Str_list* yes_no_list;
     std::list<std::string> yes_no_list_ref;
+    std::list<std::string> messages;
     Knowledge_tree_ref* knowledge_tree_ref;
     Knowledge_tree_ref* current_node_ref;
-
     void update(char* user_input);
     Model_ref();
+    void rewind_n_times(int n);
 };
 
