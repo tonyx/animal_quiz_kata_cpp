@@ -30,12 +30,11 @@ static char * test_knowledge_tree_class() {
 }
 
 static char * when_guess_is_correct_then_the_message_will_be_yeah() {
-    Model* model = get_initial_model();
-
+    Model_ref* model = new Model_ref();
     model->state = GUESSING_STATE;
-    update_model(model,(char*)"");
+    model->update((char*)"");
     mu_assert((char*)"next state is not CHECKING_IF_GUESS_IS_CORRECT",model->state == CHECKING_GUESS_IN_LEAF_NODE_STATE);
-    update_model(model,(char*)"yes");
+    model->update((char*)"yes");
     mu_assert((char*)"yeah",strcmp(model->message_from_engine_ref,(char*)"yeah")==0);
     return 0;
 }
@@ -43,21 +42,20 @@ static char * when_guess_is_correct_then_the_message_will_be_yeah() {
 
 
 static char * when_guess_is_not_correct_then_the_state_will_be_ask_what_animal_was() {
-    Model* model = get_initial_model();
-
+    Model_ref* model = new Model_ref();
     model->state = GUESSING_STATE;
-    update_model(model,(char*)"");
+    model->update((char*)"");
     mu_assert((char*)"next state is not CHECKING_IF_GUESS_IS_CORRECT",model->state == CHECKING_GUESS_IN_LEAF_NODE_STATE);
-    update_model(model,(char*)"no");
+    model->update((char*)"no");
     mu_assert((char*)"state",model->state == GETTING_ANIMAL_NAME_STATE);
     mu_assert((char*)"yeah",strcmp(model->message_from_engine_ref,(char*)"what animal was?")==0);
     return 0;
 }
 
 static char * after_asking_what_animal_was_will_get_ask_the_question_to_distinguish() {
-    Model* model = get_initial_model();
+    Model_ref* model = new Model_ref();
     model->state = GETTING_ANIMAL_NAME_STATE;
-    update_model(model,(char*)"cat");
+    model->update((char*)"cat");
     mu_assert((char*)"the animal to be learned should be a cat",strcmp((char*)"cat",model->animal_to_be_learned)==0);
     mu_assert((char*)"the question is not as expected",
         strcmp(model->message_from_engine_ref,(char*)"what is the question to distinguish a cat from a elephant?")==0);
@@ -65,32 +63,32 @@ static char * after_asking_what_animal_was_will_get_ask_the_question_to_distingu
 }
 
 static char * after_giving_the_question_to_distinguish_animals_will_as_what_is_the_answer() {
-    Model* model = get_initial_model();
+    Model_ref* model = new Model_ref();
     model->state = GETTING_ANIMAL_NAME_STATE;
-    update_model(model,(char*)"cat");
+    model->update((char*)"cat");
     mu_assert((char*)"state",model->state==GETTING_DISCRIMINATING_QUESTION);
     mu_assert((char*)"the animal to be learned should be a cat",strcmp((char*)"cat",model->animal_to_be_learned)==0);
     mu_assert((char*)"the question is not as expected",
         strcmp(model->message_from_engine_ref,(char*)"what is the question to distinguish a cat from a elephant?")==0);
-    update_model(model,(char*)"is it big?");
+    model->update((char*)"is it big?");
     mu_assert(model->message_from_engine_ref,(strcmp((char*)"what is the answer to the question 'is it big?' to distinguish a cat from a elephant?",model->message_from_engine_ref)==0));
     return 0;
 }
 
 static char * after_asking_what_is_the_answer_to_the_discriinating_will_receive_the_answer() {
-    Model* model = get_initial_model();
+    Model_ref* model = new Model_ref();
 
     model->state = GETTING_ANIMAL_NAME_STATE; 
-    update_model(model,(char*)"cat");
+    model->update((char*)"cat");
 
     mu_assert((char*)"the animal to be learned should be a cat",strcmp((char*)"cat",model->animal_to_be_learned)==0);
     mu_assert((char*)"the question is not as expected",
         strcmp(model->message_from_engine_ref,(char*)"what is the question to distinguish a cat from a elephant?")==0);
-    update_model(model,(char*)"is it big?");
+    model->update((char*)"is it big?");
     mu_assert(model->message_from_engine_ref,(strcmp((char*)"what is the answer to the question 'is it big?' to distinguish a cat from a elephant?",
         model->message_from_engine_ref)==0));
     mu_assert((char*)"state should be GETTING_ANSWER_TO_DISCRIMINATING_QUESTION",model->state==GETTING_ANSWER_TO_DISCRIMINATING_QUESTION);
-    update_model(model,(char*)"no");
+    model->update((char*)"no");
     // mu_assert((char*)"new root",model->knowledge_tree_ref->leaf_or_not_leaf==IS_NON_LEAF);
     mu_assert((char*)"new root2",(strcmp(model->knowledge_tree_ref->discriminating_question,(char*)"is it big?")==0));
     mu_assert((char*)"new root3",(strcmp(model->knowledge_tree_ref->yes_branch->animal,(char*)"elephant")==0));
@@ -99,39 +97,39 @@ static char * after_asking_what_is_the_answer_to_the_discriinating_will_receive_
 }
 
 static char * will_create_a_new_tree_structure_after_learning() {
-    Model* model = get_initial_model();
+    Model_ref* model = new Model_ref();
 
     model->state = GETTING_ANIMAL_NAME_STATE; 
-    update_model(model,(char*)"cat");
+    model->update((char*)"cat");
 
     model->animal_to_be_learned = concatenate_strings(1,(char*)"cat");
 
     mu_assert((char*)"the animal to be learned should be a cat",strcmp((char*)"cat",model->animal_to_be_learned)==0);
     mu_assert((char*)"the question is not as expected",
         strcmp(model->message_from_engine_ref,(char*)"what is the question to distinguish a cat from a elephant?")==0);
-    update_model(model,(char*)"is it big?");
+    model->update((char*)"is it big?");
     mu_assert(model->message_from_engine_ref,(strcmp((char*)"what is the answer to the question 'is it big?' to distinguish a cat from a elephant?",
         model->message_from_engine_ref)==0));
     mu_assert((char*)"state should be GETTING_ANSWER_TO_DISCRIMINATING_QUESTION",model->state==GETTING_ANSWER_TO_DISCRIMINATING_QUESTION);
-    update_model(model,(char*)"no");
+    model->update((char*)"no");
     // mu_assert((char*)"the new type of knowledge tree is non leaf",model->knowledge_tree_ref->leaf_or_not_leaf == IS_NON_LEAF);
     return 0;
 }
 
 static char * will_navigate_the_non_leaf_tree_by_questions() {
-    Model* model = get_initial_model();
+    Model_ref* model = new Model_ref();
     Knowledge_tree_ref* yes_node= new Knowledge_tree_ref_leaf((char*)"elephant");
     Knowledge_tree_ref* no_node=new Knowledge_tree_ref_leaf((char*)"cat");
     Knowledge_tree_ref* composed_tree = new Knowledge_tree_ref_non_leaf((char*)"is it big?",yes_node,no_node);
     model->knowledge_tree_ref = composed_tree;
     model->current_node_ref = model->knowledge_tree_ref;
-    update_model(model,(char*)"");
+    model->update((char*)"");
     mu_assert((char*)"next state is not GUESSING",model->state == GUESSING_STATE);
-    update_model(model,(char*)"");
+    model->update((char*)"");
     mu_assert(concatenate_strings(2,(char*)"expecting is it big? but getting ",model->message_from_engine_ref),
         strcmp(model->message_from_engine_ref,(char*)"is it big?")==0);
     mu_assert((char*)"state",model->state == CHECKING_GUESS_IN_NON_LEAF_NODE_STATE);
-    update_model(model,(char*)"no");
+    model->update((char*)"no");
     mu_assert((char*)"animal",strcmp((model->current_node_ref)->animal,(char*)"cat")==0);
     return 0;
 }
@@ -148,27 +146,27 @@ static char * test_list() {
 
 
 static char *reproducing_bug() {
-    Model* model = get_initial_model();
-    update_model(model,(char*)"");
-    update_model(model,(char*)"");
+    Model_ref* model = new Model_ref();
+    model->update((char*)"");
+    model->update((char*)"");
     mu_assert((char*)"non elephant",strcmp(model->message_from_engine_ref,(char*)"is it a elephant?")==0);
-    update_model(model,(char*)"no");
-    update_model(model,(char*)"cat");
-    update_model(model,(char*)"is it big?");
-    update_model(model,(char*)"no"); 
+    model->update((char*)"no");
+    model->update((char*)"cat");
+    model->update((char*)"is it big?");
+    model->update((char*)"no"); 
     // mu_assert((char*)"should be non leaf",model->knowledge_tree_ref->leaf_or_not_leaf==IS_NON_LEAF);
     mu_assert((char*)"root shuld be question is it big",(strcmp(model->knowledge_tree_ref->discriminating_question,(char*)"is it big?")==0));
     mu_assert((char*)"yes branch should be elephant",strcmp(model->knowledge_tree_ref->yes_branch->animal,(char*)"elephant")==0);
     mu_assert((char*)"no branch should be cat",strcmp(model->knowledge_tree_ref->no_branch->animal,(char*)"cat")==0);
 
     // starts again
-    update_model(model,(char*)""); 
+    model->update((char*)""); 
 
-    update_model(model,(char*)"no"); // big
-    update_model(model,(char*)"no"); // cat
-    update_model(model,(char*)"mouse"); 
-    update_model(model,(char*)"cheese?"); 
-    update_model(model,(char*)"yes");  
+    model->update((char*)"no"); // big
+    model->update((char*)"no"); // cat
+    model->update((char*)"mouse"); 
+    model->update((char*)"cheese?"); 
+    model->update((char*)"yes");  
 
     // mu_assert((char*)"should be non leaf",model->knowledge_tree_ref->leaf_or_not_leaf==IS_NON_LEAF);
     mu_assert((char*)"root shuld be question is it big",(strcmp(model->knowledge_tree_ref->discriminating_question,(char*)"is it big?")==0));
@@ -178,14 +176,14 @@ static char *reproducing_bug() {
     mu_assert((char*)"mouse check",strcmp(model->knowledge_tree_ref->no_branch->yes_branch->animal,(char*)"mouse")==0);
     mu_assert((char*)"cat check",strcmp(model->knowledge_tree_ref->no_branch->no_branch->animal,(char*)"cat")==0);
 
-    update_model(model,(char*)""); 
+    model->update((char*)""); 
     
     // starts again
-    update_model(model,(char*)"yes");  
-    update_model(model,(char*)"no");  
-    update_model(model,(char*)"pterodaptil");  
-    update_model(model,(char*)"estinct?");  
-    update_model(model,(char*)"yes");  
+    model->update((char*)"yes");  
+    model->update((char*)"no");  
+    model->update((char*)"pterodaptil");  
+    model->update((char*)"estinct?");  
+    model->update((char*)"yes");  
 
     // mu_assert((char*)"should be non leaf",model->knowledge_tree_ref->leaf_or_not_leaf==IS_NON_LEAF); 
     mu_assert((char*)"root shuld be question is it big",(strcmp(model->knowledge_tree_ref->discriminating_question,(char*)"is it big?")==0));
@@ -199,14 +197,14 @@ static char *reproducing_bug() {
 
     // starts again
     
-    update_model(model,(char*)"");  
-    update_model(model,(char*)"yes");  
-    update_model(model,(char*)"no");  
-    update_model(model,(char*)"no");  
-    update_model(model,(char*)"cow");  
-    update_model(model,(char*)"deliver milk?");  
-    update_model(model,(char*)"yes");  
-    update_model(model,(char*)"");  
+    model->update((char*)"");  
+    model->update((char*)"yes");  
+    model->update((char*)"no");  
+    model->update((char*)"no");  
+    model->update((char*)"cow");  
+    model->update((char*)"deliver milk?");  
+    model->update((char*)"yes");  
+    model->update((char*)"");  
     char *outmessage = concatenate_strings(2,(char*)"initial state issue ",model->message_from_engine_ref);
     mu_assert(outmessage,strcmp(model->message_from_engine_ref,(char*)"is it big?")==0);
     
@@ -223,15 +221,15 @@ static char *reproducing_bug() {
     mu_assert((char*)"yes branch of no branch of yes branch should be cow",strcmp(model->knowledge_tree_ref->yes_branch->no_branch->yes_branch->animal,(char*)"cow") == 0);
     mu_assert((char*)"no branch of no branch of yes branch should be elephant",strcmp(model->knowledge_tree_ref->yes_branch->no_branch->no_branch->animal,(char*)"elephant") == 0);
 
-    update_model(model,(char*)"");  
+    model->update((char*)"");  
     mu_assert((char*)"ask if it is big",strcmp(model->message_from_engine_ref,(char*)"is it big?")==0);
-    update_model(model,(char*)"yes");  
+    model->update((char*)"yes");  
     mu_assert((char*)"ask if it is estinct",strcmp(model->message_from_engine_ref,(char*)"estinct?")==0);
-    update_model(model,(char*)"no");  
+    model->update((char*)"no");  
     mu_assert((char*)"ask if it deliver milks",strcmp(model->message_from_engine_ref,(char*)"deliver milk?")==0);
-    update_model(model,(char*)"yes");  
+    model->update((char*)"yes");  
     mu_assert((char*)"ask if it is an elephant",strcmp(model->message_from_engine_ref,(char*)"is it a cow?")==0);
-    update_model(model,(char*)"no");  
+    model->update((char*)"no");  
 
     return 0;
 }
@@ -253,9 +251,9 @@ static char * stdLibListTest() {
     mu_assert((char*)"strings",myString==secondString);
 
     Model_ref* model_ref = new Model_ref();
-    model_ref->yes_no_list.push_back("hello");
+    // model_ref->yes_no_list.push_back("hello");
 
-    mu_assert((char*)"due",model_ref->yes_no_list.size()==1);
+    // mu_assert((char*)"due",model_ref->yes_no_list.size()==1);
 
     return 0;
 }
