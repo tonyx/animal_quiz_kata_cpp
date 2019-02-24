@@ -10,7 +10,7 @@
 #include <list>
 using namespace std;
 #define STDIO_INCLUDED
-// #define NO_MAIN
+#define NO_MAIN
 
 const char* THINK_ABOUT_AN_ANIMAL_MESSAGE = "think about an animal";
 const char* WELCOME_MESSAGE = "welcome";
@@ -229,7 +229,6 @@ void Model_ref::update(char* user_input) {
             break;
     }
 }
-
 
 #ifndef NO_MAIN
 int main(int argc, char **argv) {
