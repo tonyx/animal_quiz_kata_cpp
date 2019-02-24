@@ -10,7 +10,7 @@
 #include <list>
 using namespace std;
 #define STDIO_INCLUDED
-#define NO_MAIN
+// #define NO_MAIN
 
 const char* THINK_ABOUT_AN_ANIMAL_MESSAGE = "think about an animal";
 const char* WELCOME_MESSAGE = "welcome";
@@ -78,6 +78,14 @@ char* Knowledge_tree_ref_non_leaf::get_animal() {
     throw std::runtime_error("unable to determine animal name in a non leaf node node");
 }
 
+State Knowledge_tree_ref_non_leaf::select_specific_checking_guess_state() {
+    return CHECKING_GUESS_IN_NON_LEAF_NODE_STATE;
+}
+
+State Knowledge_tree_ref_leaf::select_specific_checking_guess_state() {
+    return CHECKING_GUESS_IN_LEAF_NODE_STATE;
+}
+
 Knowledge_tree_ref::~Knowledge_tree_ref() {
 }
 
@@ -141,15 +149,10 @@ void Model_ref::update(char* user_input) {
             break;
 
         case GUESSING_STATE:
-
             free(message_from_engine_ref);
             message_from_engine_ref = current_node_ref->get_question();
-            if (dynamic_cast<Knowledge_tree_ref_leaf*>(current_node_ref)!=NULL) 
-            {
-                state = CHECKING_GUESS_IN_LEAF_NODE_STATE;
-            } else {
-                state = CHECKING_GUESS_IN_NON_LEAF_NODE_STATE;
-            }
+            state = current_node_ref->select_specific_checking_guess_state();
+
             break;
 
         case CHECKING_GUESS_IN_LEAF_NODE_STATE:
@@ -176,11 +179,7 @@ void Model_ref::update(char* user_input) {
 
             free(message_from_engine_ref);
             message_from_engine_ref = current_node_ref->get_question(); 
-            if (dynamic_cast<Knowledge_tree_ref_leaf*>(current_node_ref)!=NULL) {
-                state = CHECKING_GUESS_IN_LEAF_NODE_STATE;
-            } else {
-                state = CHECKING_GUESS_IN_NON_LEAF_NODE_STATE;
-            } 
+            state= current_node_ref->select_specific_checking_guess_state();
             break;
 
         case GETTING_ANIMAL_NAME_STATE:
