@@ -120,6 +120,7 @@ void Model_ref::rewind_n_times(int n) {
 
     std:list<string> previous_messages; 
     previous_messages = this->messages;
+    this->messages.clear();
     free_str_list(&yes_no_list);
     this->yes_no_list=NULL;
     int i=0;
