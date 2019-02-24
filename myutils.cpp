@@ -88,4 +88,3 @@ void get_user_input(char* user_input) {
         }
     }
 }
-

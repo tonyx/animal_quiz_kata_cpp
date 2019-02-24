@@ -10,7 +10,7 @@
 #include <list>
 using namespace std;
 #define STDIO_INCLUDED
-#define NO_MAIN
+// #define NO_MAIN
 
 const char* THINK_ABOUT_AN_ANIMAL_MESSAGE = "think about an animal";
 const char* WELCOME_MESSAGE = "welcome";
@@ -61,6 +61,22 @@ Knowledge_tree_ref* Knowledge_tree_ref_non_leaf::rearrange_knowledge_tree(Str_li
     }
 }
 
+
+char* Knowledge_tree_ref_leaf::get_question() {
+    return concatenate_strings(3,"is it a ",animal,"?");
+}
+
+char* Knowledge_tree_ref_non_leaf::get_question() {
+    return concatenate_strings(1,discriminating_question);
+}
+
+char* Knowledge_tree_ref_leaf::get_animal() {
+    return animal;
+}
+
+char* Knowledge_tree_ref_non_leaf::get_animal() {
+    throw std::runtime_error("unable to determine animal name in a non leaf node node");
+}
 
 Knowledge_tree_ref::~Knowledge_tree_ref() {
 }
@@ -125,14 +141,13 @@ void Model_ref::update(char* user_input) {
             break;
 
         case GUESSING_STATE:
+
+            free(message_from_engine_ref);
+            message_from_engine_ref = current_node_ref->get_question();
             if (dynamic_cast<Knowledge_tree_ref_leaf*>(current_node_ref)!=NULL) 
             {
-                free(message_from_engine_ref);
-                message_from_engine_ref = concatenate_strings(3,"is it a ",(current_node_ref)->animal,"?");
                 state = CHECKING_GUESS_IN_LEAF_NODE_STATE;
             } else {
-                free(message_from_engine_ref);
-                message_from_engine_ref = concatenate_strings(1,current_node_ref->discriminating_question);
                 state = CHECKING_GUESS_IN_NON_LEAF_NODE_STATE;
             }
             break;
@@ -159,13 +174,11 @@ void Model_ref::update(char* user_input) {
             } else 
                 break;
 
-           if (dynamic_cast<Knowledge_tree_ref_leaf*>(current_node_ref)!=NULL) {
-                free(message_from_engine_ref);
-                message_from_engine_ref = concatenate_strings(3,"is it a ",(current_node_ref)->animal,"?");
+            free(message_from_engine_ref);
+            message_from_engine_ref = current_node_ref->get_question(); 
+            if (dynamic_cast<Knowledge_tree_ref_leaf*>(current_node_ref)!=NULL) {
                 state = CHECKING_GUESS_IN_LEAF_NODE_STATE;
             } else {
-                free(message_from_engine_ref);
-                message_from_engine_ref = concatenate_strings(1,current_node_ref->discriminating_question);
                 state = CHECKING_GUESS_IN_NON_LEAF_NODE_STATE;
             } 
             break;
@@ -179,8 +192,7 @@ void Model_ref::update(char* user_input) {
             free(message_from_engine_ref);
             message_from_engine_ref= concatenate_strings(5,"what is the question to distinguish a ",
                    animal_to_be_learned," from a ",
-                   (current_node_ref)->animal,"?");
-
+                   current_node_ref->get_animal(),"?");
             state = GETTING_DISCRIMINATING_QUESTION;
             break;
 
@@ -211,7 +223,7 @@ void Model_ref::update(char* user_input) {
                 "' to distinguish a ",
                 animal_to_be_learned,
                 " from a ",
-                (current_node_ref)->animal,"?"  );
+                (current_node_ref)->get_animal(),"?"  );
 
             state = GETTING_ANSWER_TO_DISCRIMINATING_QUESTION;
             break;
