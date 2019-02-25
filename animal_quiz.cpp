@@ -10,11 +10,29 @@
 #include <list>
 using namespace std;
 #define STDIO_INCLUDED
-// #define NO_MAIN
+#define NO_MAIN
 
 const char* THINK_ABOUT_AN_ANIMAL_MESSAGE = "think about an animal";
 const char* WELCOME_MESSAGE = "welcome";
 
+bool answer_for_state_is_binary(State state) {
+    switch (state) {
+        case THINK_ABOUT_AN_ANIMAL_STATE:
+            return false;
+        case GUESSING_STATE:
+            return false;
+        case CHECKING_GUESS_IN_LEAF_NODE_STATE:
+            return true;
+        case CHECKING_GUESS_IN_NON_LEAF_NODE_STATE:
+            return true;
+        case GETTING_ANIMAL_NAME_STATE:
+            return false;
+        case GETTING_DISCRIMINATING_QUESTION:
+            return false;
+        case GETTING_ANSWER_TO_DISCRIMINATING_QUESTION:
+            return true;
+    }
+}
 
 Knowledge_tree_ref_leaf::Knowledge_tree_ref_leaf(char* animal_in) {
     this->animal = concatenate_strings(1,animal_in);
@@ -86,6 +104,14 @@ State Knowledge_tree_ref_leaf::select_specific_checking_guess_state() {
     return CHECKING_GUESS_IN_LEAF_NODE_STATE;
 }
 
+char* Knowledge_tree_ref_non_leaf::get_info() {
+    return get_question();
+}
+
+char* Knowledge_tree_ref_leaf::get_info() {
+    return get_animal();
+}
+
 Knowledge_tree_ref::~Knowledge_tree_ref() {
 }
 
@@ -130,13 +156,17 @@ void Model_ref::rewind_n_times(int n) {
     previous_messages.clear();
 }
 
+void Model_ref::undo() {
+    int size = this->messages.size()-1; 
+        if (size>2) { 
+        this->rewind_n_times(size);
+    }
+    return;
+}
 
 void Model_ref::update(char* user_input) {
     if (strcmp(user_input,"*")==0) {
-        int size = this->messages.size()-1;
-        if (size>2) {
-            this->rewind_n_times(size);
-        }
+        undo();
         return;
     } 
 
@@ -153,7 +183,6 @@ void Model_ref::update(char* user_input) {
             free(message_from_engine_ref);
             message_from_engine_ref = current_node_ref->get_question();
             state = current_node_ref->select_specific_checking_guess_state();
-
             break;
 
         case CHECKING_GUESS_IN_LEAF_NODE_STATE:
