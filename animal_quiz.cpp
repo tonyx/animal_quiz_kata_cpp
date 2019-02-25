@@ -45,6 +45,8 @@ Knowledge_tree_ref_non_leaf::Knowledge_tree_ref_non_leaf(char* discriminating_qu
     this->no_branch=no_branch;
 }
 
+
+// deprecated: 
 Knowledge_tree_ref* Knowledge_tree_ref_leaf::rearrange_knowledge_tree(Str_list* yes_no_list,char* new_discriminating_question,char* answer_to_new_discriminating_question, char* new_animal_name) 
 {
     if (!(strcmp(answer_to_new_discriminating_question,"no")==0)&&!(strcmp(answer_to_new_discriminating_question,"yes")==0))
@@ -63,6 +65,40 @@ Knowledge_tree_ref* Knowledge_tree_ref_leaf::rearrange_knowledge_tree(Str_list* 
     }
 }
 
+void Knowledge_tree_ref::rearrange_knowledge_tree_ref(Str_list* yes_no_list,
+        char* new_discriminating_question,
+        char* answer_to_new_discriminating_question, char* new_animal_name,Knowledge_tree_ref** outTree) {
+            Knowledge_tree_ref_leaf* down_casted_tree;
+            if ((down_casted_tree=dynamic_cast<Knowledge_tree_ref_leaf*>(*outTree))!=NULL) {
+                char* old_animal = concatenate_strings(1,(*outTree)->get_animal());
+                if (strcmp("no",answer_to_new_discriminating_question)==0) {
+                    Knowledge_tree_ref_non_leaf* new_node = new Knowledge_tree_ref_non_leaf(new_discriminating_question,new Knowledge_tree_ref_leaf(old_animal),new Knowledge_tree_ref_leaf(new_animal_name));
+                    delete(*outTree);
+                    *outTree = new_node;
+                }
+                else if (strcmp("yes",answer_to_new_discriminating_question)==0) {
+                    Knowledge_tree_ref_non_leaf* new_node = new Knowledge_tree_ref_non_leaf(new_discriminating_question,new Knowledge_tree_ref_leaf(new_animal_name),new Knowledge_tree_ref_leaf(old_animal));
+                    delete(*outTree);
+                    *outTree = new_node;
+                } else {
+                    std::cerr << concatenate_strings(2,"the string passed must be 'yes' or 'no' while it's value is ",answer_to_new_discriminating_question) << endl;
+                    throw std::runtime_error("parmeter error");
+                }
+            } else
+            {
+                if (strcmp("no",yes_no_list->element)==0) {
+                    rearrange_knowledge_tree_ref(yes_no_list->next,new_discriminating_question,answer_to_new_discriminating_question,new_animal_name,(&(*outTree)->no_branch));
+                } else if (strcmp("yes",yes_no_list->element)==0) {
+                    rearrange_knowledge_tree_ref(yes_no_list->next,new_discriminating_question,answer_to_new_discriminating_question,new_animal_name,(&(*outTree)->yes_branch));
+                } else {
+                    std::cerr << concatenate_strings(2,"the string passed must be 'yes' or 'no' while it's value is ",answer_to_new_discriminating_question) << endl;
+                    throw std::runtime_error("parmeter error");
+                }
+            }
+        }
+
+
+// deprecated: can't purge the old nodes in the heap memory, so this funciton is replaced by the static rearrange_knowledge_tree_ref
 Knowledge_tree_ref* Knowledge_tree_ref_non_leaf::rearrange_knowledge_tree(Str_list* yes_no_list,char* new_discriminating_question,char* answer_to_new_discriminating_question, char* new_animal_name) 
 {
     if (!(strcmp(answer_to_new_discriminating_question,"no")==0)&&!(strcmp(answer_to_new_discriminating_question,"yes")==0))
@@ -72,10 +108,16 @@ Knowledge_tree_ref* Knowledge_tree_ref_non_leaf::rearrange_knowledge_tree(Str_li
     }
 
     if (strcmp(yes_no_list->element,"no")==0) {
-        return new Knowledge_tree_ref_non_leaf(this->discriminating_question,this->yes_branch,this->no_branch->rearrange_knowledge_tree(yes_no_list->next,new_discriminating_question,answer_to_new_discriminating_question,new_animal_name));
+        return new Knowledge_tree_ref_non_leaf(this->discriminating_question,
+        this->yes_branch,
+        this->no_branch->rearrange_knowledge_tree(yes_no_list->next,
+            new_discriminating_question,answer_to_new_discriminating_question,new_animal_name));
 
     } else {
-        return new Knowledge_tree_ref_non_leaf(this->discriminating_question,this->yes_branch->rearrange_knowledge_tree(yes_no_list->next,new_discriminating_question,answer_to_new_discriminating_question,new_animal_name),this->no_branch);
+        return new Knowledge_tree_ref_non_leaf(this->discriminating_question,
+        this->yes_branch->rearrange_knowledge_tree(yes_no_list->next,
+            new_discriminating_question,answer_to_new_discriminating_question,new_animal_name),
+        this->no_branch);
     }
 }
 
@@ -85,7 +127,7 @@ char* Knowledge_tree_ref_leaf::get_question() {
 }
 
 char* Knowledge_tree_ref_non_leaf::get_question() {
-    return concatenate_strings(1,discriminating_question);
+    return discriminating_question;
 }
 
 char* Knowledge_tree_ref_leaf::get_animal() {
@@ -95,6 +137,17 @@ char* Knowledge_tree_ref_leaf::get_animal() {
 char* Knowledge_tree_ref_non_leaf::get_animal() {
     throw std::runtime_error("unable to determine animal name in a non leaf node node");
 }
+
+void Knowledge_tree_ref_non_leaf::set_animal(char* animal) {
+    throw std::runtime_error("unable to set animal name in a non leaf node node");
+}
+
+void Knowledge_tree_ref_leaf::set_animal(char* animal_in) {
+    this->animal = concatenate_strings(1,animal_in);
+}
+
+
+
 
 State Knowledge_tree_ref_non_leaf::select_specific_checking_guess_state() {
     return CHECKING_GUESS_IN_NON_LEAF_NODE_STATE;
@@ -181,7 +234,8 @@ void Model_ref::update(char* user_input) {
 
         case GUESSING_STATE:
             free(message_from_engine_ref);
-            message_from_engine_ref = current_node_ref->get_question();
+            // ref:
+            message_from_engine_ref = concatenate_strings(1,current_node_ref->get_question());
             state = current_node_ref->select_specific_checking_guess_state();
             break;
 
@@ -208,7 +262,8 @@ void Model_ref::update(char* user_input) {
                 break;
 
             free(message_from_engine_ref);
-            message_from_engine_ref = current_node_ref->get_question(); 
+            message_from_engine_ref = concatenate_strings(1,current_node_ref->get_question()); 
+
             state= current_node_ref->select_specific_checking_guess_state();
             break;
 
@@ -222,6 +277,7 @@ void Model_ref::update(char* user_input) {
             message_from_engine_ref= concatenate_strings(5,"what is the question to distinguish a ",
                    animal_to_be_learned," from a ",
                    current_node_ref->get_animal(),"?");
+
             state = GETTING_DISCRIMINATING_QUESTION;
             break;
 
@@ -229,7 +285,12 @@ void Model_ref::update(char* user_input) {
             if ((strcmp("no",user_input)!=0)&&(strcmp("yes",user_input)!=0)) {
                 break;
             }
-            knowledge_tree_ref = knowledge_tree_ref->rearrange_knowledge_tree (yes_no_list,discriminating_question_for_learning,user_input,animal_to_be_learned);
+            // TODO: refactor in a completely mutable way, as the old trees can't be freeed in this way
+            // knowledge_tree_ref = knowledge_tree_ref->rearrange_knowledge_tree (yes_no_list,discriminating_question_for_learning,user_input,animal_to_be_learned);
+
+            Knowledge_tree_ref::rearrange_knowledge_tree_ref(yes_no_list,discriminating_question_for_learning,user_input,animal_to_be_learned,&knowledge_tree_ref);
+
+
             current_node_ref = knowledge_tree_ref;
 
             free(message_from_engine_ref);

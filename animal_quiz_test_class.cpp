@@ -149,7 +149,7 @@ static char *reproducing_bug() {
     model->update((char*)"cat");
     model->update((char*)"is it big?");
     model->update((char*)"no"); 
-    mu_assert(concatenate_strings(2,(char*)"root should be question is it big but rather is: ",model->knowledge_tree_ref->get_question()),(strcmp(model->knowledge_tree_ref->get_question(),(char*)"is it big?")==0));
+    mu_assert(concatenate_strings(2,(char*)"rootX should be question is it big but rather is: ",model->knowledge_tree_ref->get_question()),(strcmp(model->knowledge_tree_ref->get_question(),(char*)"is it big?")==0));
     mu_assert((char*)"yes branch should be elephant",strcmp(model->knowledge_tree_ref->yes_branch->get_animal(),(char*)"elephant")==0);
     mu_assert((char*)"no branch should be cat",strcmp(model->knowledge_tree_ref->no_branch->get_animal(),(char*)"cat")==0);
 

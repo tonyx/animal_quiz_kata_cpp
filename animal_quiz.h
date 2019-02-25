@@ -25,21 +25,32 @@ class Knowledge_tree_ref {
     static void set_tree_viewer(Tree_viewer* fun);
     virtual char* get_info() = 0;
     virtual char* get_animal() = 0;
+    virtual void set_animal(char* animal) =0;
     virtual State select_specific_checking_guess_state() = 0;
     virtual char* get_question() = 0;
     virtual ~Knowledge_tree_ref() = 0;
+
+    // deprecated:
     virtual Knowledge_tree_ref* rearrange_knowledge_tree(Str_list* yes_no_list,
         char* new_discriminating_question,
         char* answer_to_new_discriminating_question, char* new_animal_name) =0;
+    
+    static void rearrange_knowledge_tree_ref(Str_list* yes_no_list,
+        char* new_discriminating_question,
+        char* answer_to_new_discriminating_question, char* new_animal_name,Knowledge_tree_ref** outTree);
+
     protected: 
     static Tree_viewer* tree_viewer;
 };
 
 class Knowledge_tree_ref_non_leaf: public Knowledge_tree_ref {
     public:
+
+    // deprecated:
     Knowledge_tree_ref* rearrange_knowledge_tree(Str_list* yes_no_list,char* new_discriminating_question,char* answer_to_new_discriminating_question, char* new_animal_name);
     char* get_question();
     char* get_animal();
+    void set_animal(char* animal);
     char* get_info();
     State select_specific_checking_guess_state(); 
     Knowledge_tree_ref_non_leaf(char* discriminating_question,Knowledge_tree_ref* yes_branch, Knowledge_tree_ref* no_branch);
@@ -50,8 +61,12 @@ class Knowledge_tree_ref_non_leaf: public Knowledge_tree_ref {
 
 class Knowledge_tree_ref_leaf: public Knowledge_tree_ref {
     public:
+
+    // deprecated:
     Knowledge_tree_ref* rearrange_knowledge_tree(Str_list* yes_no_list,char* new_discriminating_question,char* answer_to_new_discriminating_question, char* new_animal_name);
+
     char* get_animal();
+    void set_animal(char* animal);
     char* get_question();
     char* get_info();
     State select_specific_checking_guess_state(); 
