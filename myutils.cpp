@@ -77,6 +77,20 @@ char * concatenate_strings(int num, ...) {
     return to_return;
 }
 
+
+void multistrcpy(char* out_buffer, int num, ...) {
+    strcpy(out_buffer,"");
+    va_list valist;
+
+    va_start(valist,num);
+    for (int i = 0; i<num; i++) {
+        strcat(out_buffer,(va_arg(valist,char*)));
+    }
+    va_end(valist);
+}
+
+
+
 void get_user_input(char* user_input) {
     fgets(user_input,97,stdin);
     if (user_input==NULL||strlen(user_input)==0) {

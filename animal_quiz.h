@@ -18,6 +18,15 @@ bool answer_for_state_is_binary(State state);
 
 using Tree_viewer = void();
 
+using Command_function = void(*)(char*);
+
+class Command_item {
+    public:
+    Command_function command;
+    char argument_buffer[97];
+    Command_item(Command_function command, char* buffer_in);
+};
+
 class Knowledge_tree_ref {
     public:
     Knowledge_tree_ref* yes_branch;
@@ -30,6 +39,9 @@ class Knowledge_tree_ref {
     virtual char* get_question() = 0;
     virtual ~Knowledge_tree_ref() = 0;
 
+    void set_buffer(char* pre_buffer, char* buffer_in);
+    char* get_buffer();
+
     // deprecated:
     virtual Knowledge_tree_ref* rearrange_knowledge_tree(Str_list* yes_no_list,
         char* new_discriminating_question,
@@ -41,6 +53,7 @@ class Knowledge_tree_ref {
 
     protected: 
     static Tree_viewer* tree_viewer;
+    char buffer[97];
 };
 
 class Knowledge_tree_ref_non_leaf: public Knowledge_tree_ref {
@@ -48,6 +61,7 @@ class Knowledge_tree_ref_non_leaf: public Knowledge_tree_ref {
 
     // deprecated:
     Knowledge_tree_ref* rearrange_knowledge_tree(Str_list* yes_no_list,char* new_discriminating_question,char* answer_to_new_discriminating_question, char* new_animal_name);
+
     char* get_question();
     char* get_animal();
     void set_animal(char* animal);
@@ -78,20 +92,26 @@ class Knowledge_tree_ref_leaf: public Knowledge_tree_ref {
 
 class Model_ref {
     public:
-    char* message_from_engine_ref;
+    char* get_message_from_engine();
+    void set_message_from_engine(int num, ...);
+    void set_message_from_engine(char* message);
     State state;
-    char* animal_of_current_node;
-    char* animal_to_be_learned;
     char* answer_to_discrimated_question;
     char* discriminating_question_for_learning;
     Str_list* yes_no_list;
     std::list<std::string> yes_no_list_ref;
     std::list<std::string> messages;
+
+    std::list<Command_item*> command_list;
+
     Knowledge_tree_ref* knowledge_tree_ref;
     Knowledge_tree_ref* current_node_ref;
     void update(char* user_input);
     void undo();
     Model_ref();
     void rewind_n_times(int n);
-};
 
+    private:
+    char message_from_engine_buffer_version[97];
+    char* animal_to_be_learned;
+};

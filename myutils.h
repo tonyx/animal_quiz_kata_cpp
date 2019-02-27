@@ -11,3 +11,5 @@ int list_size(Str_list** list,int *current_counter);
 struct str_list* tail_of_list(struct str_list* list);
 char * concatenate_strings(int num, ...);
 void get_user_input(char* user_input);
+
+void multistrcpy(char* out_buffer, int num, ...);
